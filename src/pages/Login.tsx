@@ -2,15 +2,28 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form"
 import { LoginSchema, LoginType } from "../types/LoginSchema";
 import axios from "axios";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login(){
-
-    const { reset, register, formState : { errors }, handleSubmit } = useForm<LoginType>( { resolver : zodResolver(LoginSchema) } );
+    
+    const navigate = useNavigate();
+    const { register, formState : { errors }, handleSubmit } = useForm<LoginType>( { resolver : zodResolver(LoginSchema) } );
+    const [resErrors, setResErrors] = useState<string | undefined>(undefined);
 
     async function onSubmit(data : LoginType){
-        reset();
         const { email, password } = data;
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}login`, { email, password });
+        const resJson = await response.data;
         
+        if(!resJson.token){
+            setResErrors(resJson.message);
+        }
+        else{
+            setResErrors(undefined);
+            localStorage.setItem("token", resJson.token);
+            navigate("/tasks");
+        }
     }
 
     return(
@@ -35,6 +48,8 @@ export default function Login(){
                 </p>
 
                 <p>{errors?.password?.message}</p>
+
+                <p style={{color:'red'}}>{resErrors}</p>
 
                 <button type="submit">Login</button>
             </form>

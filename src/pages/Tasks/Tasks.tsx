@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios"
-import { TaskType } from "../types/TaskSchema";
+import { TaskType } from "../../types/TaskSchema";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
@@ -8,10 +8,17 @@ export default function Tasks(){
 
     const [page,setPage] = useState<number>(1);
     const [title,setTitle] = useState<string>("");
+    const [done,setDone] = useState<string>("");
 
     const getTasks = async() => {
         const token = localStorage.getItem("token");
-        const tareas = await axios.get<TaskType[]>(`${import.meta.env.VITE_BASE_URL}tasks?page=${page}&title=${title}`,{
+        let url = `${import.meta.env.VITE_BASE_URL}tasks?page=${page}`;
+
+        //Estas condiciones se usan para agregar filtros a la url
+        if (title) url += `&title=${title}`;
+        if (done) url += `&done=${done}`;
+
+        const tareas = await axios.get<TaskType[]>(url,{
             headers : {
                 'Authorization' : `Bearer ${token}`
             }
@@ -20,7 +27,7 @@ export default function Tasks(){
     }
     
     const { data, isLoading, isError, error } = useQuery({
-        queryKey : ["tareas",page,title],
+        queryKey : ["tareas",page,title,done],
         queryFn : getTasks
     })
 
@@ -33,12 +40,17 @@ export default function Tasks(){
         
         <p>
             <input type="text" value={title} onChange={(e) => { setTitle(e.target.value); setPage(1) }} placeholder="Buscar tarea..."/>
+            <select value={done} onChange={(e) => { setDone(e.target.value); setPage(1) }} >
+                <option value="">Todos</option>
+                <option value="true">Completadas</option>
+                <option value="false">Pendientes</option>
+            </select>
         </p>
 
         <div style={{display:"flex"}}>
             {page > 1 && <button onClick={() => setPage(page-1)}>Anterior</button> }
             <h4 style={{margin:"0 10px"}}>Pagina {page}</h4>
-            { (data?.length ?? 0) > 0 && <button onClick={() => setPage(page+1)}>Siguiente</button>}
+            { data && data?.length === 10 && <button onClick={() => setPage(page+1)}>Siguiente</button>}
         </div>
 
         {isLoading ? (<h4>Cargando...</h4>) :

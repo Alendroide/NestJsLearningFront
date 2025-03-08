@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { TaskSchema, TaskType } from "../types/TaskSchema";
+import { TaskSchema, TaskType } from "../../types/TaskSchema";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -48,6 +48,7 @@ export default function TasksEdit(){
 
     return(
         <>
+            <button onClick={() => navigate(-1)}>Atrás</button>
             <h1>Editar tarea</h1>
             <form onSubmit={handleSubmit(onSubmit)}>
                 
@@ -70,7 +71,7 @@ export default function TasksEdit(){
 
                 <p>{errors.description?.message}</p>
 
-                <button type="submit">Crear</button>
+                <button type="submit">Editar</button>
             </form>
         </>
     )

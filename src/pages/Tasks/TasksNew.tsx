@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { TaskSchema, TaskType } from "../types/TaskSchema";
+import { TaskSchema, TaskType } from "../../types/TaskSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +29,7 @@ export default function TasksNew() {
 
     return (
         <>
+            <button onClick={() => navigate(-1)}>Atrás</button>
             <h1>Crear nueva tarea</h1>
             <form onSubmit={handleSubmit(onSubmit)}>
                 
